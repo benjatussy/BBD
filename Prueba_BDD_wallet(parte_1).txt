@@ -1,0 +1,34 @@
+SELECT USERNAME, PASSWORD, DEFAULT_TABLESPACE, TO_CHAR(CREATED, 'DD/MM/YYYY HH:MI') AS CREATED
+FROM DBA_USERS
+WHERE USERNAME LIKE '%SERVICE%';
+SELECT * FROM DBA_DATA_FILES;
+-- Usuario 1
+DROP USER owner_fservices_bcg;
+CREATE USER owner_fservices_bcg IDENTIFIED BY Prueba2_Bdy1102 DEFAULT TABLESPACE DATA QUOTA 10M ON DATA;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE INDEXTYPE, CREATE SYNONYM TO owner_fservices_bcg;
+
+--Usuario 2
+DROP USER dev_fservices_bcg CASCADE;
+CREATE USER dev_fservices_bcg IDENTIFIED BY Prueba2_Bdy1102 DEFAULT TABLESPACE DATA QUOTA 5M ON DATA;
+GRANT CREATE SESSION, CREATE VIEW TO dev_fservices_bcg;
+
+-- Usuario 3
+DROP USER cons_fservices_bcg;
+CREATE USER cons_fservices_bcg IDENTIFIED BY Prueba2_Bdy1102 DEFAULT TABLESPACE DATA;
+GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SYNONYM TO cons_fservices_bcg;
+
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON owner_fservices_bcg.Administrador TO dev_fservices_bcg;
+GRANT SELECT, UPDATE, INSERT, DELETE ON owner_fservices_bcg.Edificio TO dev_fservices_bcg;
+
+-- ASIGNAR ROLES
+CREATE ROLE rol_consultant_fservices;
+GRANT CREATE SESSION, CREATE PROCEDURE TO rol_consultant_fservices;
+GRANT rol_consultant_fservices TO cons_fservices_bcg;
+
+CREATE ROLE rol_desarrollador;
+GRANT CREATE SESSION, CREATE ANY VIEW TO rol_desarrollador;
+
+
+CREATE PUBLIC SYNONYM SYN_ADMIN FOR owner_fservices_bcg.Administrador;
+CREATE PUBLIC SYNONYM SYN_EDIFICIO FOR owner_fservices_bcg.Edificio;
